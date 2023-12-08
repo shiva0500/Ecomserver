@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const multer = require('multer');
-const fs = require('fs/promises');
 const cors = require('cors');
+const fs = require('fs/promises');
 
 const app = express();
 const PORT = 5000;
@@ -10,13 +9,17 @@ const PORT = 5000;
 app.use(bodyParser.json());
 app.use(cors());
 
-const FS = require('fs');
-
 // Load user data from JSON file
 const loadUserData = async () => {
   try {
-    const data = await fs.readFile('users.json', 'utf8');
-    return JSON.parse(data);
+    const data = await fs.readFile('Users.json', 'utf-8');
+    const jsonData = JSON.parse(data);
+
+    if (jsonData.users) {
+      return jsonData.users;
+    } else {
+      return jsonData;
+    }
   } catch (error) {
     return [];
   }
@@ -24,7 +27,7 @@ const loadUserData = async () => {
 
 // Save user data to JSON file
 const saveUserData = async (data) => {
-  await fs.writeFile('users.json', JSON.stringify(data, null, 2), 'utf8');
+  await fs.writeFile('Users.json', JSON.stringify({ users: data }, null, 2), 'utf-8');
 };
 
 // User Registration
@@ -37,7 +40,7 @@ app.post('/api/signup', async (req, res) => {
 
   if (!userExists) {
     const newUser = {
-      id: Date.now().toString(),
+      user_id: Date.now(), // Using a timestamp as a unique identifier
       username,
       email,
       password,
@@ -66,15 +69,16 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Fetch user data by email
 app.get('/userdata/email/:email', async (req, res) => {
   const userEmail = req.params.email;
 
   try {
     const users = await loadUserData();
-    const user = users.find(user => user.email === userEmail);
+    const user = users.find((user) => user.email === userEmail);
 
     if (user) {
-      res.status(200).json({ user });
+      res.status(200).json([user]); // Wrap user in an array
     } else {
       res.status(404).json({ error: 'User not found.' });
     }
@@ -84,16 +88,13 @@ app.get('/userdata/email/:email', async (req, res) => {
 });
 
 
-
-
 // Product Fetching
 app.get('/:limit', async (req, res) => {
   const { limit } = req.params;
   try {
-    FS.readFile('Products.json', 'utf-8', (error, data) => {
-      const d = JSON.parse(data);
-      res.json(d);
-    });
+    const data = await fs.readFile('Products.json', 'utf-8');
+    const products = JSON.parse(data);
+    res.json(products);
   } catch (error) {
     console.error('Fetching error from API', error.message);
     res.status(500).send('API fetch error');
