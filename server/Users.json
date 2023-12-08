@@ -1,0 +1,26 @@
+[
+  {
+    "user_id": 1,
+    "username": "shiva",
+    "email": "shiva@gmail.com",
+    "password": "123"
+  },
+  {
+    "user_id": 2,
+    "username": "dinesh",
+    "email": "dinesh@gmail.com",
+    "password": "1234"
+  },
+  {
+    "id": "1701869731683",
+    "username": "test",
+    "email": "test@gmail.com",
+    "password": "123456789"
+  },
+  {
+    "id": "1702021193880",
+    "username": "ugh",
+    "email": "ugh@gmail.com",
+    "password": "753698"
+  }
+]
